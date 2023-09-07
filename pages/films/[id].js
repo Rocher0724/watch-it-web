@@ -15,13 +15,20 @@ export async function getStaticPaths() {
       { params: { id: '2'} },
       { params: { id: '9'} },
     ],
-    fallback: false,
+    fallback: true,
   }
 }
 export async function getStaticProps(context) {
   const movieId = context.params['id']
-  const res = await axios.get(`/movies/${movieId}`)
-  const movie = res.data
+  let movie;
+  try {
+    const res = await axios.get(`/movies/${movieId}`)
+    movie = res.data
+  } catch (e) {
+    return {
+      notFount: true
+    }
+  }
 
   return {
       props: {
@@ -59,6 +66,11 @@ export default function Movie({ movie }) {
     getMovieReviews(id)
   }, [id, getMovieReviews])
 
+  if (!movie) return (
+    <div className={styles.loading}>
+
+    </div>
+  )
   return (
     <>
       <div className={styles.header}>
