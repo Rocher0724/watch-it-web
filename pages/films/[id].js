@@ -57,7 +57,7 @@ export default function Movie({ movie }) {
   useEffect(() => {
     if (!id) return
     getMovieReviews(id)
-  }, [id, getMovie, getMovieReviews])
+  }, [id, getMovieReviews])
 
   return (
     <>
