@@ -7,6 +7,31 @@ import {useCallback, useEffect, useState} from "react";
 import axios from "@/lib/axios";
 import Image from "next/image";
 
+export async function getStaticPaths() {
+
+  return {
+    paths: [
+      { params: { id: '1'} },
+      { params: { id: '2'} },
+      { params: { id: '9'} },
+    ],
+    fallback: false,
+  }
+}
+export async function getStaticProps(context) {
+  const movieId = context.params['id']
+  const res = await axios.get(`/movies/${movieId}`)
+  const movie = res.data
+
+  return {
+      props: {
+        movie
+      }
+  }
+
+
+}
+
 const labels = {
   rating: {
     12: '12세이상관람가',
@@ -16,18 +41,11 @@ const labels = {
   },
 };
 
-export default function Movie({ movies }) {
+export default function Movie({ movie }) {
   const router = useRouter();
   const id = router.query['id'];
 
-  const [movie, setMovie] = useState({})
   const [movieReviews, setMovieReviews] = useState([])
-
-  const getMovie = useCallback(async (targetId) => {
-    const res = await axios.get(`/movies/${id}`)
-    const nextMovie = res.data
-    setMovie(nextMovie)
-  }, [id])
 
   const getMovieReviews = useCallback(async (targetId) => {
     const res = await axios.get(`/movie_reviews/?movie_id=${id}`)
@@ -38,7 +56,6 @@ export default function Movie({ movies }) {
   }, [id])
   useEffect(() => {
     if (!id) return
-    getMovie(id)
     getMovieReviews(id)
   }, [id, getMovie, getMovieReviews])
 
